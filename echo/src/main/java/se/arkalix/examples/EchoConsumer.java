@@ -1,47 +1,47 @@
 package se.arkalix.examples;
 
 import se.arkalix.dto.DtoEncoding;
-import se.arkalix.http.HttpMethod;
-import se.arkalix.http.client.HttpClient;
-import se.arkalix.http.client.HttpClientRequest;
-import se.arkalix.security.X509KeyStore;
-import se.arkalix.security.X509TrustStore;
-import se.arkalix.util.concurrent.FutureScheduler;
+import se.arkalix.net.http.HttpMethod;
+import se.arkalix.net.http.client.HttpClient;
+import se.arkalix.net.http.client.HttpClientRequest;
+import se.arkalix.security.identity.OwnedIdentity;
+import se.arkalix.security.identity.TrustStore;
+import se.arkalix.util.concurrent.Schedulers;
 
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 
-public class EchoClient {
+public class EchoConsumer {
     public static void main(final String[] args) {
         if (args.length != 2) {
             System.err.println("Usage: java -jar example.jar <keyStorePath> <trustStorePath>");
             System.exit(1);
         }
         try {
-            System.out.println("Running echo client ...");
+            System.out.println("Running echo consumer ...");
 
-            // Load keystore and truststore.
-            // The key store represents the systems own identity, while the
-            // trust store represents all identities that are to be trusted.
+            // Load owned system identity and truststore.
             final var password = new char[]{'1', '2', '3', '4', '5', '6'};
-            final var keyStore = new X509KeyStore.Loader()
+            final var identity = new OwnedIdentity.Loader()
                 .keyPassword(password)
                 .keyStorePath(Path.of(args[0]))
                 .keyStorePassword(password)
                 .load();
-            final var trustStore = X509TrustStore.read(Path.of(args[1]), password);
+            final var trustStore = TrustStore.read(Path.of(args[1]), password);
+            Arrays.fill(password, '\0');
 
             // Create Arrowhead client.
             final var client = new HttpClient.Builder()
-                .keyStore(keyStore)
+                .identity(identity)
                 .trustStore(trustStore)
                 .build();
 
-            final var echoSystemSocketAddress = new InetSocketAddress("localhost", 28081);
+            final var echoProviderSocketAddress = new InetSocketAddress("localhost", 28081);
 
-            // HTTP GET request. Callback hell.
-            client.send(echoSystemSocketAddress, new HttpClientRequest()
+            // HTTP GET request without function composition.
+            client.send(echoProviderSocketAddress, new HttpClientRequest()
                 .method(HttpMethod.GET)
                 .uri("/example/pings/32")
                 .header("accept", "application/json"))
@@ -74,18 +74,17 @@ public class EchoClient {
                     }
                 });
 
-            // HTTP POST request. Function composition.
-            client.send(echoSystemSocketAddress, new HttpClientRequest()
+            // HTTP POST request with function composition.
+            client.send(echoProviderSocketAddress, new HttpClientRequest()
                 .method(HttpMethod.POST)
                 .uri("/example/pings")
                 .body(DtoEncoding.JSON, new PingBuilder()
                     .ping("pong!")
                     .build()))
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PingDto.class))
-                .map(body -> {
+                .ifSuccess(body -> {
                     System.err.println("\nPOST /example/pings result:");
                     System.err.println(body.asString());
-                    return null;
                 })
                 .onFailure(throwable -> {
                     System.err.println("\nPOST /example/pings failure:");
@@ -93,7 +92,7 @@ public class EchoClient {
                 });
 
             // HTTP DELETE request.
-            client.send(echoSystemSocketAddress, new HttpClientRequest()
+            client.send(echoProviderSocketAddress, new HttpClientRequest()
                 .method(HttpMethod.DELETE)
                 .uri("/example/runtime"))
                 .onResult(result -> {
@@ -102,8 +101,8 @@ public class EchoClient {
                     result.ifFailure(Throwable::printStackTrace);
 
                     // Exit in 0.5 seconds.
-                    FutureScheduler.getDefault()
-                        .scheduleAfter(() -> System.exit(0), Duration.ofMillis(500))
+                    Schedulers.fixed()
+                        .schedule(Duration.ofMillis(500), () -> System.exit(0))
                         .onFailure(Throwable::printStackTrace);
                 });
         }

@@ -6,7 +6,7 @@
 
     <groupId>se.arkalix.examples</groupId>
     <artifactId>echo</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <name>Echo System and Client</name>
     <url>https://arkalix.se</url>
@@ -14,13 +14,14 @@
     <packaging>jar</packaging>
 
     <properties>
-        <kalix.version>0.1.0</kalix.version>
+        <kalix.version>0.2.0</kalix.version>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>se.arkalix</groupId>
             <artifactId>kalix-base</artifactId>
@@ -37,6 +38,14 @@
             <version>${kalix.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- SLF4J JUL Back-End -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+
     </dependencies>
 
     <build>
