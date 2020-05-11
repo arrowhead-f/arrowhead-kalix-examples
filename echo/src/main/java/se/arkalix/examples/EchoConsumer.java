@@ -84,7 +84,7 @@ public class EchoConsumer {
                 .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PingDto.class))
                 .ifSuccess(body -> {
                     System.err.println("\nPOST /example/pings result:");
-                    System.err.println(body.asString());
+                    System.err.println(body);
                 })
                 .onFailure(throwable -> {
                     System.err.println("\nPOST /example/pings failure:");
