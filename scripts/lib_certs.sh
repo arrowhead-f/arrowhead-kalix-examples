@@ -1,6 +1,6 @@
-# Uses `keytool`, typically bundled with Java installations, as well as
-# `openssl` to generate and sign keystores, certificates and truststores for
-# Arrowhead roots, clouds, systems and system operators.
+# Uses `keytool`, typically bundled with Java installations, to generate and
+# sign keystores, certificates and truststores for Arrowhead roots, clouds,
+# systems and system operators.
 
 # The environment variable PASSWORD is used to set the password of all
 # created key stores. If it is not set, "123456" is used by default. The
@@ -13,7 +13,7 @@ fi
 # Creates a root certificate keystore and a corresponding PEM certificate.
 #
 # If the keystore already exists, the operation does nothing. If the PEM
-# cerificate is missing, it will be created either from the already
+# certificate is missing, it will be created either from the already
 # existing or new keystore.
 #
 # @param $1 Path to desired root certificate keystore.
@@ -59,7 +59,7 @@ create_root_keystore() {
 # specified root, and a corresponding PEM certificate.
 #
 # If the keystore already exists, the operation does nothing. If the PEM
-# cerificate is missing, it will be created either from the already
+# certificate is missing, it will be created either from the already
 # existing or new keystore. If the root keystore has changed since an
 # existing cloud keystore was created, it is recreated.
 #
@@ -149,7 +149,7 @@ create_cloud_keystore() {
 # file.
 #
 # If the keystore already exists, the operation does nothing. If either the
-# PEM cerificate or public key file is missing, those will be created either
+# PEM certificate or public key file is missing, those will be created either
 # from the already existing or new keystore. If the cloud keystore has changed
 # since an existing system keystore was created, it is recreated.
 #
@@ -256,7 +256,7 @@ create_system_keystore() {
 # Authority) file, a public key file and a private key file.
 #
 # If the keystore already exists, the operation does nothing. If the PEM
-# cerificate is missing, it will be created either from the already
+# certificate is missing, it will be created either from the already
 # existing or new keystore. If the cloud keystore has changed since an
 # existing system operator keystore was created, it is recreated.
 #
@@ -359,6 +359,7 @@ create_truststore() {
     mkdir -p "$(dirname "${TRUSTSTORE}")"
 
     for ((j = 1; j < ARGC; j = j + 2)); do
+      echo -e "> \e[34mImporting \e[33m${ARGV[j]}\e[0m"
       keytool -importcert -v \
         -keystore "${TRUSTSTORE}" \
         -storetype "PKCS12" \
