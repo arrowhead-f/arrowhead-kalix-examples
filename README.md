@@ -12,11 +12,13 @@ convenient to reuse service integrations.
 This repository contains examples of how the `ar:kalix` libraries may be used.
 The following examples are currently available:
 
-| Name           | Description                |
-|----------------|----------------------------|
-| [`echo`][echo] | An echo client and system. |
+| Name                       | Description                                    |
+|----------------------------|------------------------------------------------|
+| [Echo (Standalone)][echos] | An echo provider and consumer, not part of and Arrowhead local cloud. |
+| [Echo (Cloud)][echoc]      | An echo provider and consumer.                 |
 
-[echo]: echo/
+[echos]: echo-standalone/
+[echoc]: echo-cloud/
 
 Please refer to [arkalix.se](https://arkalix.se) for more information about the
 Arrowhead Kalix library and the Arrowhead Framework.
