@@ -81,7 +81,7 @@ public class EchoConsumer {
                 .body(DtoEncoding.JSON, new PingBuilder()
                     .ping("pong!")
                     .build()))
-                .flatMap(response -> response.bodyAsClassIfSuccess(DtoEncoding.JSON, PingDto.class))
+                .flatMap(response -> response.bodyAsIfSuccess(PingDto.class))
                 .ifSuccess(body -> {
                     System.err.println("\nPOST /example/pings result:");
                     System.err.println(body);

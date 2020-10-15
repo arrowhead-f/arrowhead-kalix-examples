@@ -82,7 +82,7 @@ public class EchoConsumer {
                 .flatMap(consumer -> consumer.send(new HttpConsumerRequest()
                     .method(HttpMethod.GET)
                     .uri("/example/pings/32")))
-                .flatMap(response -> response.bodyAsClassIfSuccess(PingDto.class))
+                .flatMap(response -> response.bodyAsIfSuccess(PingDto.class))
                 .ifSuccess(ping -> {
                     System.out.println("GET /example/pings/32 result:");
                     System.out.println(ping);

@@ -2,7 +2,7 @@
 
 trap 'pkill -P $$' SIGINT SIGTERM
 
-mvn package
+mvn clean package -U
 
 CP="$(find . -wholename './target/*-jar-with-dependencies.jar' | tr '\n' ':')"
 

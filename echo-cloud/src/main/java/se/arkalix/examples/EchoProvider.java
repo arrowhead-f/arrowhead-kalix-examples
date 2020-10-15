@@ -11,7 +11,6 @@ import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Schedulers;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;

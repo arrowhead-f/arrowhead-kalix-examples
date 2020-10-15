@@ -24,6 +24,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 @DtoToString
+@SuppressWarnings("unused")
 interface Ping {
     /**
      * Any string.
