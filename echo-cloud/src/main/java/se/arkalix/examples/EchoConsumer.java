@@ -96,7 +96,7 @@ public class EchoConsumer {
             system.consume()
                 .name("kalix-example-provider-service")
                 .encodings(EncodingDescriptor.JSON)
-                .using(HttpConsumer.factory())
+                .oneUsing(HttpConsumer.factory())
                 .flatMap(consumer -> consumer.send(new HttpConsumerRequest()
                     .method(HttpMethod.DELETE)
                     .uri("/example/runtime")))
