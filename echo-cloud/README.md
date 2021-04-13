@@ -23,7 +23,7 @@ Docker and Maven installed on your system before entering the following
 commands into a POSIX-terminal positioned in this directory.
 
 ```sh
-$ mvn clean package
+$ ./gradlew shadowJar
 $ docker-compose up --build
 ```
 
