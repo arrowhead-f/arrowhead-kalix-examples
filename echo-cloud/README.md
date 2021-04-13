@@ -3,13 +3,16 @@
 In this example, two Arrowhead systems interact while using the service
 registration, authorization and orchestration capabilities of the three
 Arrowhead core systems with the corresponding names. The first interacting
-system provides a service the another system consumes that service. The
+system provides a service and the other system consumes that service. The
 service provider is configured to only grant access to its service if the
 system attempting to consume it has a token issued by the same authorization
 system of that local cloud.
 
 The example should serve as a good starting point for getting familiar with
-how to use Arrowhead Kalix for integration with Arrowhead local clouds.
+how to use Arrowhead Kalix for integration with Arrowhead local clouds. It
+should be noted, however, that, at the time this was being written, configuring
+local clouds can be tedious and error-prone. This is actively being improved
+with future releases of Arrowhead.
 
 ## Running
 
@@ -26,16 +29,18 @@ $ docker-compose up --build
 
 The second command might have to be preceded by `sudo` if running on a Linux
 system. After seeing the Docker network nodes spin up and write to your
-terminal, you will discover that the consumer system was not able to discover
-the provider system. The reason for this is that there are currently no
-authorization and orchestration rules set up to allow for that discovery to
-happen.
+terminal, you will discover that a system we have not yet mentioned is started
+before the echo provider and consumer. The started system created the necessary
+rules in the service registry, authorization and orchestration systems for the
+provider and consumer to be able to communicate.
 
-To make needed configurations, import the _system operator key store_
-([`crypto/sysop.p12`](crypto/sysop.p12)) to your web
-browser (the password is `123456`). Then use the following addresses to use
-the Swagger interfaces of the different services to manually enter the
-required rules.
+To look at these rules, import the _system operator key store_
+([`crypto/sysop.p12`](crypto/sysop.p12)) to your web browser (the password is
+`123456`) and the _system trust store_
+([`crypto/truststore.p12`](crypto/truststore.p12)) (same password). Make sure
+that the `arrowhead.eu` certificate is trusted to identify websites. Then use
+the following addresses to use the Swagger interfaces of the different services
+to manually enter or review the required rules.
 
 - Service Registry [`https://localhost:8443`](`https://localhost:8443`)
 - Authorization [`https://localhost:8445`](`https://localhost:8445`)
@@ -43,10 +48,6 @@ required rules.
 
 For more information about how to setup the rules, please consult
 [`https://github.com/arrowhead-f/core-java-spring/blob/master/README.md`](https://github.com/arrowhead-f/core-java-spring/blob/master/README.md).
-
-After the rules are setup, take down the local cloud and take it up again.
-If the rules were configured correctly, the interaction should now proceed
-without incident.
 
 ## Help Improve This Example
 

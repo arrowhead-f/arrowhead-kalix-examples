@@ -11,6 +11,7 @@ import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Schedulers;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -45,7 +46,7 @@ public class EchoProvider {
             final var system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
-                .localPort(9001)
+                .localHostnamePort("echo-provider.local", 9001)
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 

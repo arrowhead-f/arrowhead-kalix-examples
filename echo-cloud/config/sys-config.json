@@ -1,0 +1,53 @@
+{
+  "interfaces": [
+    "HTTP-SECURE-HTML",
+    "HTTP-SECURE-JSON"
+  ],
+  "serviceRegistryHost": "service-registry.local:8443",
+  "providers": [
+    {
+      "address": "echo-provider.local",
+      "authenticationInfo": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo/i52QKWPi7YcSBIp5g0wAyhUx02lWDt1e8YCvEYFcHsTLImFR8OjXfiLw4pySpPq/4imbVNcceohKBohJpf8D9JHobAW2fvXcaPHD+48pnGJWnTvOl9KDHb8gAzoOkHhWFtq4bIJj47m+VH8+0gL/aySvqagMMryvUrxwrnT1l65axlkoQ9ypTAKJ4sAl0ns41VIO3qc6+gUVY0LPIb1p6IoA+JSihHZNKN4vbYOmWIftJwwIwps3GKLZUAPdi/5PPIw82DSmDDJsen+noA7Um9XzCKW/HRPo84f/MHAtXQeHP0zco46c5ZNeVV6ulUZSaZLKQZNsCSxcAeT7EZnwIDAQAB",
+      "port": 9001,
+      "systemName": "echo_provider"
+    },
+    {
+      "address": "echo-consumer.local",
+      "authenticationInfo": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkha//mSpd/07keaDo1Y1Wpbu/2XrGtsvp5OkRujHNe+KArUt0H9QhKgWNs8iZ7OXnhhyuYnzFHE3uiGenzfzuhvu65hl4agwv8m5gULvI+2PDINrvWBqStBPayARYJygJeBzmdHwlbpTz9WMBqVyZ/k3L8cBDstdg3eBB24cNvjp9TdP/wrGT+7qp8E29nMHuUIUExe8cbbEGlh4/06TDRBBVGS2Gkaq9PW92vvd3kp/KnX/7pU27tmqj1lSKdwVZUMRdCzZyi4dRFlOgM1ehlWGML4NNeLOvvUV7CGnFzQXQzbI9oQQYcerh00zhOf3xScddzfAtB4bk90iwN3tMwIDAQAB",
+      "port": 9002,
+      "systemName": "echo_consumer"
+    }
+  ],
+  "services": [
+    {
+      "serviceDefinition": "kalix-example-provider-service",
+      "providerIndex": 0,
+      "serviceUri": "/example",
+      "secure": "TOKEN",
+      "interfaces": [
+        "HTTP-SECURE-JSON"
+      ]
+    },
+    {
+      "$comment": "This service must exist (Arrowhead 4.1.3) in order to ensure that the echo_consumer system is actually registered. The reason for this is that there is no way to register a system without also specifying a service.",
+      "serviceDefinition": "kalix-example-consumer-dummy",
+      "providerIndex": 1,
+      "serviceUri": "/dummy",
+      "secure": "CERTIFICATE",
+      "interfaces": [
+        "HTTP-SECURE-JSON"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "consumer": "echo_consumer",
+      "services": [
+        "kalix-example-provider-service"
+      ],
+      "providers": [
+        "echo_provider"
+      ]
+    }
+  ]
+}

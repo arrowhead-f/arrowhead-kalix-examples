@@ -44,8 +44,8 @@ create_cloud_system_keystore "service_registry"  "dns:service-registry.local,ip:
 create_cloud_system_keystore "echo_consumer"     "dns:echo-consumer.local,ip:192.168.1.20"
 create_cloud_system_keystore "echo_provider"     "dns:echo-provider.local,ip:192.168.1.21"
 
-# This certificate must be imported into your browser before being able to
-# access the authorization and orchestration systems to add authorization and
+# This certificate can be imported into your browser to access the Swagger GUIs
+# of the authorization and orchestration systems to add authorization and
 # orchestration rules.
 create_sysop_keystore \
   "crypto/master.p12" "arrowhead.eu" \

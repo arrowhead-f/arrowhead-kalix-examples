@@ -6,27 +6,41 @@ services:
 
   echo-provider.local:
     container_name: echo-provider.local
-    build: .
+    build: sys-provider
     volumes:
-      - ./crypto/system.echo_provider.p12:/opt/keystore.p12
-      - ./crypto/truststore.p12:/opt/truststore.p12
+      - ./config/crypto/system.echo_provider.p12:/opt/keystore.p12
+      - ./config/crypto/truststore.p12:/opt/truststore.p12
       - ../scripts/wait-for.sh:/opt/wait-for.sh
     ports:
       - 9001:9001
-    command: ["/bin/bash", "-c", "cd /opt && ./wait-for.sh orchestrator.local 8441 5 && \
-      java -XX:+UseSerialGC -Xmx1G -Xms32m -cp echo.jar se.arkalix.examples.EchoProvider keystore.p12 truststore.p12 service-registry.local 8443"]
+    command: ["/bin/bash", "-c", "cd /opt && ./wait-for.sh echo-config.local 9999 5 && \
+      java -XX:+UseSerialGC -Xmx1G -Xms32m -cp app.jar se.arkalix.examples.EchoProvider keystore.p12 truststore.p12 service-registry.local 8443"]
 
   echo-consumer.local:
     container_name: echo-consumer.local
-    build: .
+    build: sys-consumer
     volumes:
-      - ./crypto/system.echo_consumer.p12:/opt/keystore.p12
-      - ./crypto/truststore.p12:/opt/truststore.p12
+      - ./config/crypto/system.echo_consumer.p12:/opt/keystore.p12
+      - ./config/crypto/truststore.p12:/opt/truststore.p12
       - ../scripts/wait-for.sh:/opt/wait-for.sh
     ports:
       - 9002:9002
     command: ["/bin/bash", "-c", "cd /opt && ./wait-for.sh echo-provider.local 9001 5 && \
-      java -XX:+UseSerialGC -Xmx1G -Xms32m -cp echo.jar se.arkalix.examples.EchoConsumer keystore.p12 truststore.p12 service-registry.local 8443"]
+      java -XX:+UseSerialGC -Xmx1G -Xms32m -cp app.jar se.arkalix.examples.EchoConsumer keystore.p12 truststore.p12 service-registry.local 8443"]
+
+  # CLOUD SETUP/CONFIGURATION SYSTEM
+  
+  echo-config.local:
+    container_name: echo-config.local
+    build: sys-config
+    volumes:
+      - ./config/crypto/sysop.p12:/opt/keystore.p12
+      - ./config/crypto/truststore.p12:/opt/truststore.p12
+      - ./config/sys-config.json:/opt/config.json
+      - ../scripts/wait-for.sh:/opt/wait-for.sh
+    ports:
+      - 9999:9999
+    command: ["/bin/bash", "-c", "cd /opt && ./wait-for.sh orchestrator.local 8441 3 && java -XX:+UseSerialGC -Xmx1G -Xms32m -jar app.jar"]
 
   # CORE SYSTEMS
 
@@ -36,9 +50,9 @@ services:
     depends_on:
       - mysql.local
     volumes:
-      - ./crypto/system.service_registry.p12:/serviceregistry/keystore.p12
-      - ./crypto/truststore.p12:/serviceregistry/truststore.p12
-      - ./properties/service_registry.properties:/serviceregistry/application.properties
+      - ./config/crypto/system.service_registry.p12:/serviceregistry/keystore.p12
+      - ./config/crypto/truststore.p12:/serviceregistry/truststore.p12
+      - ./config/properties/service_registry.properties:/serviceregistry/application.properties
       - ../scripts/wait-for.sh:/serviceregistry/wait-for.sh
     ports:
       - 8443:8443
@@ -51,9 +65,9 @@ services:
     depends_on:
       - mysql.local
     volumes:
-      - ./crypto/system.authorization.p12:/authorization/keystore.p12
-      - ./crypto/truststore.p12:/authorization/truststore.p12
-      - ./properties/authorization.properties:/authorization/application.properties
+      - ./config/crypto/system.authorization.p12:/authorization/keystore.p12
+      - ./config/crypto/truststore.p12:/authorization/truststore.p12
+      - ./config/properties/authorization.properties:/authorization/application.properties
       - ../scripts/wait-for.sh:/authorization/wait-for.sh
     ports:
       - 8445:8445
@@ -66,9 +80,9 @@ services:
     depends_on:
       - mysql.local
     volumes:
-      - ./crypto/system.orchestrator.p12:/orchestrator/keystore.p12
-      - ./crypto/truststore.p12:/orchestrator/truststore.p12
-      - ./properties/orchestrator.properties:/orchestrator/application.properties
+      - ./config/crypto/system.orchestrator.p12:/orchestrator/keystore.p12
+      - ./config/crypto/truststore.p12:/orchestrator/truststore.p12
+      - ./config/properties/orchestrator.properties:/orchestrator/application.properties
       - ../scripts/wait-for.sh:/orchestrator/wait-for.sh
     ports:
       - 8441:8441

@@ -13,6 +13,7 @@ import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Schedulers;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -48,7 +49,7 @@ public class EchoConsumer {
             final var system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
-                .localPort(9002)
+                .localHostnamePort("echo-consumer.local", 9002)
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
@@ -56,10 +57,10 @@ public class EchoConsumer {
             // registering a system, which is required for the system to be
             // able to consume services.
             system.provide(new HttpService()
-                .name("kalix-example-consumer-service")
+                .name("kalix-example-consumer-dummy")
                 .encodings(EncodingDescriptor.JSON)
-                .accessPolicy(AccessPolicy.token())
-                .basePath("/example")
+                .accessPolicy(AccessPolicy.cloud())
+                .basePath("/dummy")
 
                 .post("/pings", (request, response) ->
                     request.bodyAs(PingDto.class)
