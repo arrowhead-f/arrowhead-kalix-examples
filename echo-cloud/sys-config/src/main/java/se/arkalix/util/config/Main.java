@@ -16,20 +16,30 @@ import java.util.logging.Level;
 public class Main {
     public static void main(final String[] args) {
         try {
-            final var password = new char[]{'1', '2', '3', '4', '5', '6'};
-            final var client = new HttpClient.Builder()
-                .identity(new OwnedIdentity.Loader()
-                    .keyStorePath("keystore.p12")
-                    .keyStorePassword(password)
-                    .keyPassword(password)
-                    .load())
-                .trustStore(TrustStore.read("truststore.p12", password))
-                .build();
-
             final var configPath = "config.json";
             final var bytes = Files.readAllBytes(Path.of(configPath));
             final var reader = new ByteArrayReader(bytes);
             final var config = ConfigDto.readJson(reader);
+
+            final var clientBuilder = new HttpClient.Builder();
+
+            if (config.insecureMode().orElse(false)) {
+                clientBuilder
+                    .identity(new OwnedIdentity.Loader()
+                        .keyStorePath(config.keyStorePath().orElse(null))
+                        .keyStorePassword(config.keyStorePassword().map(String::toCharArray).orElse(null))
+                        .keyAlias(config.keyAlias().orElse(null))
+                        .keyPassword(config.keyPassword().map(String::toCharArray).orElse(null))
+                        .load())
+                    .trustStore(TrustStore.read(
+                        config.trustStorePath().orElse(null),
+                        config.trustStorePassword().map(String::toCharArray).orElse(null)));
+            }
+            else {
+                clientBuilder.insecure();
+            }
+
+            final var client = clientBuilder.build();
 
             final var srSocketAddress = config.serviceRegistrySocketAddress();
 

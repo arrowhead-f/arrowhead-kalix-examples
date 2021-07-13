@@ -3,6 +3,7 @@ package se.arkalix.util.config.data;
 import se.arkalix.dto.DtoReadableAs;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
@@ -10,7 +11,7 @@ import static se.arkalix.dto.DtoEncoding.JSON;
 public interface SrMgmtProvider {
     String address();
 
-    String authenticationInfo();
+    Optional<String> authenticationInfo();
 
     String createdAt();
 

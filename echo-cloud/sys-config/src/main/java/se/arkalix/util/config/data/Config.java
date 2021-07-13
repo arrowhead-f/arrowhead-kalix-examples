@@ -4,11 +4,26 @@ import se.arkalix.dto.DtoReadableAs;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Optional;
 
 import static se.arkalix.dto.DtoEncoding.JSON;
 
 @DtoReadableAs(JSON)
 public interface Config {
+    Optional<String> keyStorePath();
+
+    Optional<String> keyStorePassword();
+
+    Optional<String> keyAlias();
+
+    Optional<String> keyPassword();
+
+    Optional<String> trustStorePath();
+
+    Optional<String> trustStorePassword();
+
+    Optional<Boolean> insecureMode();
+
     String serviceRegistryHost();
 
     default InetSocketAddress serviceRegistrySocketAddress() {

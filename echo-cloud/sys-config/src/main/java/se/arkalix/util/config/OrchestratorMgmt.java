@@ -42,7 +42,7 @@ public class OrchestratorMgmt {
                         final var srProvider = registry.getProviderByNameOrThrow(providerName);
                         final var orProvider = new OrMgmtProviderBuilder()
                             .address(srProvider.address())
-                            .authenticationInfo(srProvider.authenticationInfo())
+                            .authenticationInfo(srProvider.authenticationInfo().orElse(null))
                             .port(srProvider.port())
                             .systemName(srProvider.systemName())
                             .build();
