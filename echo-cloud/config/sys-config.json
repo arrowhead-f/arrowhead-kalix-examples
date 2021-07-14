@@ -1,7 +1,7 @@
 {
   "keyStorePath": "keystore.p12",
   "keyStorePassword": "123456",
-  "keyStoreKeyPassword": "123456",
+  "keyPassword": "123456",
   "trustStorePath": "truststore.p12",
   "trustStorePassword": "123456",
   "interfaces": [
