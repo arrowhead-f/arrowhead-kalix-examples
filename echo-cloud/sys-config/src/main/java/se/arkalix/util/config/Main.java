@@ -1,10 +1,13 @@
 package se.arkalix.util.config;
 
-import se.arkalix.dto.binary.ByteArrayReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import se.arkalix.io.buf.Buffer;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Futures;
+import se.arkalix.util.concurrent.Schedulers;
 import se.arkalix.util.config.data.ConfigDto;
 
 import java.net.ServerSocket;
@@ -14,16 +17,21 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class Main {
+    public static Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(final String[] args) {
         try {
             final var configPath = "config.json";
             final var bytes = Files.readAllBytes(Path.of(configPath));
-            final var reader = new ByteArrayReader(bytes);
-            final var config = ConfigDto.readJson(reader);
+            final var reader = Buffer.wrap(bytes).asReader();
+            final var config = ConfigDto.decodeJson(reader);
 
             final var clientBuilder = new HttpClient.Builder();
 
             if (config.insecureMode().orElse(false)) {
+                clientBuilder.insecure();
+            }
+            else {
                 clientBuilder
                     .identity(new OwnedIdentity.Loader()
                         .keyStorePath(config.keyStorePath().orElse(null))
@@ -34,9 +42,6 @@ public class Main {
                     .trustStore(TrustStore.read(
                         config.trustStorePath().orElse(null),
                         config.trustStorePassword().map(String::toCharArray).orElse(null)));
-            }
-            else {
-                clientBuilder.insecure();
             }
 
             final var client = clientBuilder.build();
@@ -62,12 +67,12 @@ public class Main {
                         authorization.register(config.rules()),
                         orchestrator.register(config.rules())));
                 })
-                .fork(ignored -> {
+                .ifSuccess(ignored -> Schedulers.dynamic().submit(() -> {
                     // Allow for other systems to determine if configuration is
                     // done by connecting to port 9999 via TCP.
+                    logger.info("Notifying about completion by accepting and closing connections on port 9999");
                     try {
-                        final ServerSocket server;
-                        server = new ServerSocket(9999);
+                        final var server = new ServerSocket(9999);
                         while (!Thread.interrupted()) {
                             try {
                                 server.accept().close();
@@ -80,9 +85,8 @@ public class Main {
                     catch (final Throwable throwable) {
                         throwable.printStackTrace(System.err);
                     }
-                })
+                }))
                 .onFailure(Main::panic);
-
         }
         catch (final Throwable throwable) {
             panic(throwable);

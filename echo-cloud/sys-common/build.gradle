@@ -3,11 +3,12 @@ plugins {
 }
 
 ext {
-    versionArkalix = '0.5.2'
+    versionArkalix = '0.6.2'
 }
 
 dependencies {
     implementation "se.arkalix:kalix-base:$versionArkalix"
     implementation "se.arkalix:kalix-core-plugins:$versionArkalix"
-    annotationProcessor "se.arkalix:kalix-processors:$versionArkalix"
+    implementation "se.arkalix:kalix-dto:$versionArkalix"
+    annotationProcessor "se.arkalix:kalix-dto-processor:$versionArkalix"
 }

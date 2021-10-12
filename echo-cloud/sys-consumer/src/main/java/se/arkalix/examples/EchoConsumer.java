@@ -1,8 +1,8 @@
 package se.arkalix.examples;
 
 import se.arkalix.ArSystem;
+import se.arkalix.codec.CodecType;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
-import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.HttpMethod;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.consumer.HttpConsumer;
@@ -13,11 +13,11 @@ import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Schedulers;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public class EchoConsumer {
     public static void main(final String[] args) {
@@ -53,17 +53,17 @@ public class EchoConsumer {
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
-            // Providing a service is, as of Arrowhead 4.1.3, the only way to
-            // registering a system, which is required for the system to be
-            // able to consume services.
+            // Providing a service is, as of Arrowhead 4.3.0, the only way to
+            // register a system, which is required for the system to be able
+            // to consume services.
             system.provide(new HttpService()
                 .name("kalix-example-consumer-dummy")
-                .encodings(EncodingDescriptor.JSON)
+                .codecs(CodecType.JSON)
                 .accessPolicy(AccessPolicy.cloud())
                 .basePath("/dummy")
 
                 .post("/pings", (request, response) ->
-                    request.bodyAs(PingDto.class)
+                    request.bodyTo(PingDto::decoder)
                         .map(body -> response
                             .status(HttpStatus.CREATED)
                             .body(body))))
@@ -78,12 +78,12 @@ public class EchoConsumer {
             // HTTP POST using automatic service lookup.
             system.consume()
                 .name("kalix-example-provider-service")
-                .encodings(EncodingDescriptor.JSON)
+                .codecTypes(CodecType.JSON)
                 .oneUsing(HttpConsumer.factory())
                 .flatMap(consumer -> consumer.send(new HttpConsumerRequest()
                     .method(HttpMethod.GET)
                     .uri("/example/pings/32")))
-                .flatMap(response -> response.bodyAsIfSuccess(PingDto.class))
+                .flatMap(response -> response.bodyToIfSuccess(PingDto::decoder))
                 .ifSuccess(ping -> {
                     System.out.println("GET /example/pings/32 result:");
                     System.out.println(ping);
@@ -96,7 +96,7 @@ public class EchoConsumer {
             // HTTP DELETE using automatic service lookup.
             system.consume()
                 .name("kalix-example-provider-service")
-                .encodings(EncodingDescriptor.JSON)
+                .codecTypes(CodecType.JSON)
                 .oneUsing(HttpConsumer.factory())
                 .flatMap(consumer -> consumer.send(new HttpConsumerRequest()
                     .method(HttpMethod.DELETE)
@@ -115,6 +115,16 @@ public class EchoConsumer {
         }
         catch (final Throwable e) {
             e.printStackTrace();
+        }
+    }
+
+    static {
+        final var logLevel = Level.ALL;
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %5$s%6$s%n");
+        final var root = java.util.logging.Logger.getLogger("");
+        root.setLevel(logLevel);
+        for (final var handler : root.getHandlers()) {
+            handler.setLevel(logLevel);
         }
     }
 }

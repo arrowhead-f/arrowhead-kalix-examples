@@ -1,19 +1,17 @@
 package se.arkalix.util.config.data;
 
-import se.arkalix.core.plugin.sr.ServiceRegistrationBuilder;
+import se.arkalix.ServiceInterface;
 import se.arkalix.core.plugin.sr.ServiceRegistrationDto;
-import se.arkalix.descriptor.InterfaceDescriptor;
-import se.arkalix.descriptor.SecurityDescriptor;
+import se.arkalix.dto.DtoCodec;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
+import se.arkalix.security.access.AccessPolicyType;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
-
-@DtoReadableAs(JSON)
+@DtoReadableAs(DtoCodec.JSON)
 @DtoToString
 public interface CfService {
     String serviceDefinition();
@@ -22,16 +20,16 @@ public interface CfService {
 
     String serviceUri();
 
-    Optional<SecurityDescriptor> secure();
+    Optional<AccessPolicyType> secure();
 
     Map<String, String> metadata();
 
     Optional<Integer> version();
 
-    List<InterfaceDescriptor> interfaces();
+    List<ServiceInterface> interfaces();
 
     default ServiceRegistrationDto toRegistrationUsing(final List<CfProvider> providers) {
-        return new ServiceRegistrationBuilder()
+        return new ServiceRegistrationDto.Builder()
             .name(serviceDefinition())
             .provider(providers.get(providerIndex()).toDetails())
             .uri(serviceUri())

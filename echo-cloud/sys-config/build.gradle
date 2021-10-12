@@ -6,13 +6,14 @@ plugins {
 mainClassName = "se.arkalix.util.config.Main"
 
 ext {
-    versionArkalix = '0.5.2'
-    versionSlf4j = '1.7.30'
+    versionArkalix = '0.6.2'
+    versionSlf4j = '1.7.32'
 }
 
 dependencies {
     implementation "se.arkalix:kalix-base:$versionArkalix"
     implementation "se.arkalix:kalix-core-plugins:$versionArkalix"
-    annotationProcessor "se.arkalix:kalix-processors:$versionArkalix"
+    implementation "se.arkalix:kalix-dto:$versionArkalix"
+    annotationProcessor "se.arkalix:kalix-dto-processor:$versionArkalix"
     implementation "org.slf4j:slf4j-jdk14:$versionSlf4j"
 }

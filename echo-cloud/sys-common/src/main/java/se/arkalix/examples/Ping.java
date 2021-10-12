@@ -1,13 +1,12 @@
 package se.arkalix.examples;
 
+import se.arkalix.dto.DtoCodec;
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
 import se.arkalix.dto.DtoWritableAs;
 
 import java.time.Instant;
 import java.util.Optional;
-
-import static se.arkalix.dto.DtoEncoding.JSON;
 
 /**
  * A so called Data Transfer Object (DTO) interface. Such an interface may
@@ -21,8 +20,8 @@ import static se.arkalix.dto.DtoEncoding.JSON;
  * from/to JSON. As the @DtoToString annotation is provided, the generated
  * "PingDto" class also gets a custom toString() implementation.
  */
-@DtoReadableAs(JSON)
-@DtoWritableAs(JSON)
+@DtoReadableAs(DtoCodec.JSON)
+@DtoWritableAs(DtoCodec.JSON)
 @DtoToString
 @SuppressWarnings("unused")
 interface Ping {

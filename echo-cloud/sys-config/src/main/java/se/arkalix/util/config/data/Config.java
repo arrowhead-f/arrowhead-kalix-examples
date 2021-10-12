@@ -1,14 +1,13 @@
 package se.arkalix.util.config.data;
 
+import se.arkalix.dto.DtoCodec;
 import se.arkalix.dto.DtoReadableAs;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
-
-@DtoReadableAs(JSON)
+@DtoReadableAs(DtoCodec.JSON)
 public interface Config {
     Optional<String> keyStorePath();
 

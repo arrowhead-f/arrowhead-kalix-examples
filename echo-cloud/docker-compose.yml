@@ -46,7 +46,7 @@ services:
 
   service-registry.local:
     container_name: service-registry.local
-    image: svetlint/serviceregistry:4.1.3
+    image: svetlint/serviceregistry:4.3.0
     depends_on:
       - mysql.local
     volumes:
@@ -57,11 +57,11 @@ services:
     ports:
       - 8443:8443
     command: ["/bin/bash", "-c", "cd /serviceregistry && ./wait-for.sh mysql.local 3306 0 && \
-      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-serviceregistry.jar"]
+      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-serviceregistry.jar --spring.config.location=application.properties"]
 
   authorization.local:
     container_name: authorization.local
-    image: svetlint/authorization:4.1.3
+    image: svetlint/authorization:4.3.0
     depends_on:
       - mysql.local
     volumes:
@@ -72,11 +72,11 @@ services:
     ports:
       - 8445:8445
     command: ["/bin/bash", "-c", "cd /authorization && ./wait-for.sh service-registry.local 8443 1 && \
-      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-authorization.jar"]
+      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-authorization.jar --spring.config.location=application.properties"]
 
   orchestrator.local:
     container_name: orchestrator.local
-    image: svetlint/orchestrator:4.1.3
+    image: svetlint/orchestrator:4.3.0
     depends_on:
       - mysql.local
     volumes:
@@ -87,13 +87,13 @@ services:
     ports:
       - 8441:8441
     command: ["/bin/bash", "-c", "cd /orchestrator && ./wait-for.sh authorization.local 8445 1 && \
-      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-orchestrator.jar"]
+      java -XX:+UseSerialGC -Xmx1G -Xms32m -jar arrowhead-orchestrator.jar --spring.config.location=application.properties"]
 
   # DATABASE USED BY CORE SYSTEMS
 
   mysql.local:
     container_name: mysql.local
-    image: mysql:5.7
+    image: mysql:8
     environment:
       - MYSQL_ROOT_PASSWORD=123456
     volumes:

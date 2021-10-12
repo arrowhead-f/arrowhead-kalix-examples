@@ -14,7 +14,6 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Objects;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
 import static se.arkalix.net.http.HttpMethod.POST;
 
 public class ServiceRegistryMgmt {
@@ -33,7 +32,7 @@ public class ServiceRegistryMgmt {
             .send(serviceRegistryHost, new HttpClientRequest()
                 .method(POST)
                 .uri("/serviceregistry/mgmt")
-                .body(JSON, service.toRegistrationUsing(providers)))
+                .body(service.toRegistrationUsing(providers)::encodeJson))
             .flatMap(MessageIncoming::bodyAsString)
             .ifSuccess(body -> {
                 logger.info("Created service entry {}/{}",

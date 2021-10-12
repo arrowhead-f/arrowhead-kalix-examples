@@ -1,8 +1,8 @@
 package se.arkalix.examples;
 
 import se.arkalix.ArSystem;
+import se.arkalix.codec.CodecType;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
-import se.arkalix.descriptor.EncodingDescriptor;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
@@ -11,7 +11,6 @@ import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Schedulers;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -56,7 +55,7 @@ public class EchoProvider {
 
                 // Mandatory service configuration details.
                 .name("kalix-example-provider-service")
-                .encodings(EncodingDescriptor.JSON)
+                .codecs(CodecType.JSON)
                 .accessPolicy(AccessPolicy.token())
                 .basePath("/example")
 
@@ -66,7 +65,7 @@ public class EchoProvider {
                 .get("/pings/#id", (request, response) -> {
                     response
                         .status(HttpStatus.OK)
-                        .body(new PingBuilder()
+                        .body(new PingDto.Builder()
                             .ping("pong")
                             // #id is the first path parameter and has index 0.
                             .id(request.pathParameter(0))
@@ -79,14 +78,14 @@ public class EchoProvider {
                 // HTTP POST endpoint that accepts a "PingData" object and
                 // returns it to its sender.
                 .post("/pings", (request, response) ->
-                    request.bodyAs(PingDto.class)
+                    request.bodyTo(PingDto::decoder)
                         .map(body -> response
                             .status(HttpStatus.CREATED)
                             .body(body)))
 
                 // HTTP POST endpoint that echoes back whatever body is in the
                 // requests it receives. Note that since EncodingDescriptor.JSON
-                // was specified via the ".encodings()" method above, only
+                // was specified via the ".codecTypes()" method above, only
                 // requests that claim to carry JSON bodies, or have no bodies
                 // at all, are accepted and reach the endpoints specified here.
                 .post("/echoes", (request, response) ->

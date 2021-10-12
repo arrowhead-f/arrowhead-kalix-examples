@@ -7,7 +7,7 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Futures;
-import se.arkalix.util.config.data.AuMgmtRuleIntraBuilder;
+import se.arkalix.util.config.data.AuMgmtRuleIntraDto;
 import se.arkalix.util.config.data.CfConsumptionRule;
 
 import java.net.InetSocketAddress;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
 import static se.arkalix.net.http.HttpMethod.POST;
 
 public class AuthorizationMgmt {
@@ -36,7 +35,7 @@ public class AuthorizationMgmt {
             .send(authorizationHost, new HttpClientRequest()
                 .method(POST)
                 .uri("/authorization/mgmt/intracloud")
-                .body(JSON, new AuMgmtRuleIntraBuilder()
+                .body(new AuMgmtRuleIntraDto.Builder()
                     .consumerId(registry.getSystemIdByNameOrThrow(rule.consumer()))
                     .interfaceIds(rule.services()
                         .stream()
@@ -51,7 +50,7 @@ public class AuthorizationMgmt {
                         .stream()
                         .map(registry::getSystemIdByNameOrThrow)
                         .collect(Collectors.toList()))
-                    .build()))
+                    .build()::encodeJson))
             .flatMap(MessageIncoming::bodyAsString)
             .ifSuccess(body -> {
                 logger.info("Created authorization rule {}", rule);

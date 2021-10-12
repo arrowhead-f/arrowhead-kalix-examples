@@ -12,13 +12,13 @@ cd ..
 # Root
 
 create_root_keystore \
-  "crypto/master.p12" "arrowhead.eu"
+  "config/crypto/master.p12" "arrowhead.eu"
 
 # Cloud
 
 create_cloud_keystore \
-  "crypto/master.p12" "arrowhead.eu" \
-  "crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu"
+  "config/crypto/master.p12" "arrowhead.eu" \
+  "config/crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu"
 
 # Cloud Systems
 
@@ -31,15 +31,15 @@ create_cloud_system_keystore() {
   SYSTEM_SAN=$2
 
   create_system_keystore \
-    "crypto/master.p12" "arrowhead.eu" \
-    "crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu" \
-    "crypto/system.${SYSTEM_NAME}.p12" "${SYSTEM_NAME}.example-cloud.my-org.arrowhead.eu" \
+    "config/crypto/master.p12" "arrowhead.eu" \
+    "config/crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu" \
+    "config/crypto/system.${SYSTEM_NAME}.p12" "${SYSTEM_NAME}.example-cloud.my-org.arrowhead.eu" \
     "${SYSTEM_SAN},dns:localhost,ip:127.0.0.1"
 }
 
 create_cloud_system_keystore "authorization"     "dns:authorization.local,ip:192.168.1.10"
 create_cloud_system_keystore "orchestrator"      "dns:orchestrator.local,ip:192.168.1.11"
-create_cloud_system_keystore "service_registry"  "dns:service-registry.local,ip:192.168.1.12"
+create_cloud_system_keystore "service_registry"  "dns:serviceregistry.local,ip:192.168.1.12"
 
 create_cloud_system_keystore "echo_consumer"     "dns:echo-consumer.local,ip:192.168.1.20"
 create_cloud_system_keystore "echo_provider"     "dns:echo-provider.local,ip:192.168.1.21"
@@ -48,13 +48,13 @@ create_cloud_system_keystore "echo_provider"     "dns:echo-provider.local,ip:192
 # of the authorization and orchestration systems to add authorization and
 # orchestration rules.
 create_sysop_keystore \
-  "crypto/master.p12" "arrowhead.eu" \
-  "crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu" \
-  "crypto/sysop.p12" "sysop.example-cloud.my-org.arrowhead.eu"
+  "config/crypto/master.p12" "arrowhead.eu" \
+  "config/crypto/cloud.p12" "example-cloud.my-org.arrowhead.eu" \
+  "config/crypto/sysop.p12" "sysop.example-cloud.my-org.arrowhead.eu"
 
 ## The same trust store can be used by all cloud systems, as the only
 ## certificate in the trust store is that of the cloud they are all
 ## members of.
 create_truststore \
-  "crypto/truststore.p12" \
-  "crypto/master.crt" "arrowhead.eu"
+  "config/crypto/truststore.p12" \
+  "config/crypto/master.crt" "arrowhead.eu"

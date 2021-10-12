@@ -2,20 +2,20 @@ package se.arkalix.util.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.arkalix.codec.CodecType;
 import se.arkalix.net.MessageIncoming;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.config.data.CfConsumptionRule;
-import se.arkalix.util.config.data.OrMgmtProviderBuilder;
-import se.arkalix.util.config.data.OrMgmtRuleBuilder;
+import se.arkalix.util.config.data.OrMgmtProviderDto;
+import se.arkalix.util.config.data.OrMgmtRuleDto;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
 import static se.arkalix.net.http.HttpMethod.POST;
 
 public class OrchestratorMgmt {
@@ -35,12 +35,12 @@ public class OrchestratorMgmt {
         return client.send(orchestratorHost, new HttpClientRequest()
             .method(POST)
             .uri("/orchestrator/mgmt/store")
-            .body(JSON, rules.stream()
+            .body(rules.stream()
                 .flatMap(rule -> rule.providers()
                     .stream()
                     .flatMap(providerName -> {
                         final var srProvider = registry.getProviderByNameOrThrow(providerName);
-                        final var orProvider = new OrMgmtProviderBuilder()
+                        final var orProvider = new OrMgmtProviderDto.Builder()
                             .address(srProvider.address())
                             .authenticationInfo(srProvider.authenticationInfo().orElse(null))
                             .port(srProvider.port())
@@ -49,7 +49,7 @@ public class OrchestratorMgmt {
 
                         return rule.services()
                             .stream()
-                            .map(serviceName -> new OrMgmtRuleBuilder()
+                            .map(serviceName -> new OrMgmtRuleDto.Builder()
                                 .consumerSystemId(registry.getSystemIdByNameOrThrow(rule.consumer()))
                                 .priority(1)
                                 .providerSystem(orProvider)
@@ -57,7 +57,7 @@ public class OrchestratorMgmt {
                                 .serviceInterfaceName(registry.getInterfaceNameByServiceNameOrThrow(serviceName))
                                 .build());
                     }))
-                .collect(Collectors.toList())))
+                .collect(Collectors.toList()), CodecType.JSON))
             .flatMap(MessageIncoming::bodyAsString)
             .ifSuccess(body -> {
                 logger.info("Created orchestration rules {}", rules);

@@ -1,12 +1,11 @@
 package se.arkalix.util.config.data;
 
+import se.arkalix.dto.DtoCodec;
 import se.arkalix.dto.DtoWritableAs;
 
 import java.util.Optional;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
-
-@DtoWritableAs(JSON)
+@DtoWritableAs(DtoCodec.JSON)
 public interface OrMgmtProvider {
     String address();
 

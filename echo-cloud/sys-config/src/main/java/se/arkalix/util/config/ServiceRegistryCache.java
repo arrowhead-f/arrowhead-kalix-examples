@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static se.arkalix.dto.DtoEncoding.JSON;
 import static se.arkalix.net.http.HttpMethod.GET;
 
 public class ServiceRegistryCache {
@@ -71,7 +70,7 @@ public class ServiceRegistryCache {
 
     public Future<?> refresh() {
         return client.send(serviceRegistryHost, new HttpClientRequest().method(GET).uri("/serviceregistry/mgmt"))
-            .flatMap(response -> response.bodyAsIfSuccess(JSON, SrMgmtQueryResultDto.class))
+            .flatMap(response -> response.bodyToIfSuccess(SrMgmtQueryResultDto::decodeJson))
             .ifSuccess(result -> result.data().forEach(entry -> {
                 final var sd = entry.serviceDefinition();
                 serviceNameToId.put(sd.serviceDefinition(), sd.id());
